@@ -1,5 +1,5 @@
 <table class="tabletext<?php echo $this->additional_class; ?>">
-	<?php foreach ($this->raw as $k => $row) : ?><tr>
-		<?php foreach ($row as $kk =>$col): ?><td><?php echo $col['value']; ?></td><?php endforeach; ?>
+	<?php foreach (is_array($this->raw) ? $this->raw : array() as $k => $row) : ?><tr>
+		<?php foreach (is_array($row) ? $row : array() as $kk =>$col): ?><td><?= $col['value'] ?></td><?php endforeach; ?>
 	</tr><?php endforeach;?>
 </table>
