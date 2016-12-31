@@ -33,10 +33,10 @@
     "source": "https://github.com/MetaModels/attribute_tabletext"
   },
   "require": {
-    "php": ">=5.3",
-    "contao/core": ">=3.2,<3.6",
-    "contao-community-alliance/composer-plugin": "~2.0",
-    "metamodels/core": "~2.0"
+    "php": ">=5.4",
+    "contao/core": "^3.5.5",
+    "contao-community-alliance/composer-plugin": "~2.0@beta",
+    "metamodels/core": "~2.0@alpha"
   },
   "require-dev": {
     "cyberspectrum/contao-toolbox": "~0.6",
@@ -73,6 +73,5 @@
       "dev-develop": "2.1.x-dev"
     }
   },
-  "minimum-stability": "dev",
   "prefer-stable": true
 }
