@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_tabletext.
  *
- * (c) 2012-2017 The MetaModels team.
+ * (c) 2012-2018 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,8 +18,8 @@
  * @author     David Greminger <david.greminger@1up.io>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2017 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0
+ * @copyright  2012-2018 The MetaModels team.
+ * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -119,7 +119,6 @@ class TableText extends BaseComplex
         $this->unsetDataFor($arrIds);
 
         // Insert or update the cells.
-        $strQueryUpdate = 'UPDATE %s';
         $strQueryInsert = 'INSERT INTO ' . $this->getValueTable() . ' %s';
 
         foreach ($arrIds as $intId) {
@@ -132,18 +131,7 @@ class TableText extends BaseComplex
                         continue;
                     }
                     $objDB
-                        ->prepare(
-                            $strQueryInsert .
-                            ' ON DUPLICATE KEY ' .
-                            str_replace(
-                                'SET ',
-                                '',
-                                $objDB
-                                    ->prepare($strQueryUpdate)
-                                    ->set($this->getSetValues($col, $intId))
-                                    ->query
-                            )
-                        )
+                        ->prepare($strQueryInsert)
                         ->set($this->getSetValues($col, $intId))
                         ->execute();
                 }
@@ -239,11 +227,9 @@ class TableText extends BaseComplex
     public function unsetDataFor($arrIds)
     {
         $arrWhere = $this->getWhere($arrIds);
+        $objDB    = $this->getMetaModel()->getServiceContainer()->getDatabase();
 
-        $this
-            ->getMetaModel()
-            ->getServiceContainer()
-            ->getDatabase()
+        $objDB
             ->prepare(
                 sprintf(
                     'DELETE FROM %1$s%2$s',
@@ -332,7 +318,7 @@ class TableText extends BaseComplex
                 $kk = str_replace('col_', '', $kk);
 
                 $newValue[$k][$kk]['value'] = $col;
-                $newValue[$k][$kk]['col']   = $kk;
+                $newValue[$k][$kk]['col']   = (int) $kk;
                 $newValue[$k][$kk]['row']   = $intRow;
             }
             $intRow++;
