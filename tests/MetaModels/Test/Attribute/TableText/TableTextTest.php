@@ -23,11 +23,13 @@
 namespace MetaModels\Test\Attribute\TableText;
 
 use MetaModels\Attribute\TableText\TableText;
+use MetaModels\IMetaModel;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests to test class TableText.
  */
-class TableTextTest extends \PHPUnit_Framework_TestCase
+class TableTextTest extends TestCase
 {
     /**
      * Mock a MetaModel.
@@ -39,26 +41,7 @@ class TableTextTest extends \PHPUnit_Framework_TestCase
      */
     protected function mockMetaModel($language, $fallbackLanguage)
     {
-        $metaModel = $this->getMock(
-            'MetaModels\MetaModel',
-            array(),
-            array(array())
-        );
-
-        $metaModel
-            ->expects($this->any())
-            ->method('getTableName')
-            ->will($this->returnValue('mm_unittest'));
-
-        $metaModel
-            ->expects($this->any())
-            ->method('getActiveLanguage')
-            ->will($this->returnValue($language));
-
-        $metaModel
-            ->expects($this->any())
-            ->method('getFallbackLanguage')
-            ->will($this->returnValue($fallbackLanguage));
+        $metaModel = $this->getMockForAbstractClass(IMetaModel::class);
 
         return $metaModel;
     }
@@ -71,6 +54,6 @@ class TableTextTest extends \PHPUnit_Framework_TestCase
     public function testInstantiation()
     {
         $text = new TableText($this->mockMetaModel('en', 'en'));
-        $this->assertInstanceOf('MetaModels\Attribute\TableText\TableText', $text);
+        $this->assertInstanceOf(TableText::class, $text);
     }
 }

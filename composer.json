@@ -46,12 +46,12 @@
   },
   "autoload": {
     "psr-0": {
-      "MetaModels": "src"
+      "MetaModels\\": "src"
     }
   },
   "autoload-dev": {
     "psr-0": {
-      "MetaModels\\Test": "tests"
+      "MetaModels\\Test\\": "tests"
     }
   },
   "extra": {
@@ -70,6 +70,5 @@
       "dev-master": "2.0.x-dev",
       "dev-develop": "2.1.x-dev"
     }
-  },
-  "prefer-stable": true
+  }
 }
