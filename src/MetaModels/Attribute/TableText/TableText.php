@@ -206,19 +206,22 @@ class TableText extends BaseComplex
             ->getDatabase()
             ->prepare(
                 sprintf(
-                    'SELECT * FROM %1$s%2$s ORDER BY row ASC, col ASC',
+                    'SELECT * FROM %1$s%2$s ORDER BY item_id ASC, row ASC, col ASC',
                     $this->getValueTable(),
                     ($arrWhere ? ' WHERE ' . $arrWhere['procedure'] : '')
                 )
             )
             ->execute(($arrWhere ? $arrWhere['params'] : null));
 
-        $arrReturn = array();
+        $countCol = count(deserialize($this->get('tabletext_cols'), true));
+        $result   = [];
+
         while ($objValue->next()) {
-            $arrReturn[$objValue->item_id][$objValue->row][] = $objValue->row();
+            $content = $objValue->row();
+            $this->pushValue($content, $result, $countCol);
         }
 
-        return $arrReturn;
+        return $result;
     }
 
     /**
@@ -346,5 +349,46 @@ class TableText extends BaseComplex
             'col'     => (int) $arrCell['col'],
             'item_id' => $intId,
         );
+    }
+
+    /**
+     * Push a database value to the passed array.
+     *
+     * @param array $value    The value from the database.
+     * @param array $result   The result list.
+     * @param int   $countCol The count of columns per row.
+     *
+     * @return void
+     */
+    private function pushValue($value, &$result, $countCol)
+    {
+        $buildRow = function (&$list, $itemId, $row) use ($countCol) {
+            for ($i = count($list); $i < $countCol; $i++) {
+                $list[$i] = [
+                    'tstamp'  => 0,
+                    'value'   => '',
+                    'att_id'  => $this->get('id'),
+                    'row'     => $row,
+                    'col'     => $i,
+                    'item_id' => $itemId,
+                ];
+            }
+        };
+
+        $itemId = $value['item_id'];
+        if (!isset($result[$itemId])) {
+            $result[$itemId] = [];
+        }
+
+        // Prepare all rows up until to this item.
+        $row = count($result[$itemId]);
+        while ($row <= $value['row']) {
+            if (!isset($result[$itemId][$row])) {
+                $result[$itemId][$row] = [];
+            }
+            $buildRow($result[$itemId][$row], $itemId, $row);
+            $row++;
+        }
+        $result[$itemId][(int) $value['row']][(int) $value['col']] = $value;
     }
 }
