@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_tabletext.
  *
- * (c) 2012-2017 The MetaModels team.
+ * (c) 2012-2018 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,8 +18,8 @@
  * @author     David Greminger <david.greminger@1up.io>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2017 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0
+ * @copyright  2012-2018 The MetaModels team.
+ * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -119,7 +119,6 @@ class TableText extends BaseComplex
         $this->unsetDataFor($arrIds);
 
         // Insert or update the cells.
-        $strQueryUpdate = 'UPDATE %s';
         $strQueryInsert = 'INSERT INTO ' . $this->getValueTable() . ' %s';
 
         foreach ($arrIds as $intId) {
@@ -132,18 +131,7 @@ class TableText extends BaseComplex
                         continue;
                     }
                     $objDB
-                        ->prepare(
-                            $strQueryInsert .
-                            ' ON DUPLICATE KEY ' .
-                            str_replace(
-                                'SET ',
-                                '',
-                                $objDB
-                                    ->prepare($strQueryUpdate)
-                                    ->set($this->getSetValues($col, $intId))
-                                    ->query
-                            )
-                        )
+                        ->prepare($strQueryInsert)
                         ->set($this->getSetValues($col, $intId))
                         ->execute();
                 }
@@ -218,19 +206,22 @@ class TableText extends BaseComplex
             ->getDatabase()
             ->prepare(
                 sprintf(
-                    'SELECT * FROM %1$s%2$s ORDER BY row ASC, col ASC',
+                    'SELECT * FROM %1$s%2$s ORDER BY item_id ASC, row ASC, col ASC',
                     $this->getValueTable(),
                     ($arrWhere ? ' WHERE ' . $arrWhere['procedure'] : '')
                 )
             )
             ->execute(($arrWhere ? $arrWhere['params'] : null));
 
-        $arrReturn = array();
+        $countCol = count(deserialize($this->get('tabletext_cols'), true));
+        $result   = [];
+
         while ($objValue->next()) {
-            $arrReturn[$objValue->item_id][$objValue->row][] = $objValue->row();
+            $content = $objValue->row();
+            $this->pushValue($content, $result, $countCol);
         }
 
-        return $arrReturn;
+        return $result;
     }
 
     /**
@@ -239,11 +230,9 @@ class TableText extends BaseComplex
     public function unsetDataFor($arrIds)
     {
         $arrWhere = $this->getWhere($arrIds);
+        $objDB    = $this->getMetaModel()->getServiceContainer()->getDatabase();
 
-        $this
-            ->getMetaModel()
-            ->getServiceContainer()
-            ->getDatabase()
+        $objDB
             ->prepare(
                 sprintf(
                     'DELETE FROM %1$s%2$s',
@@ -332,7 +321,7 @@ class TableText extends BaseComplex
                 $kk = str_replace('col_', '', $kk);
 
                 $newValue[$k][$kk]['value'] = $col;
-                $newValue[$k][$kk]['col']   = $kk;
+                $newValue[$k][$kk]['col']   = (int) $kk;
                 $newValue[$k][$kk]['row']   = $intRow;
             }
             $intRow++;
@@ -360,5 +349,46 @@ class TableText extends BaseComplex
             'col'     => (int) $arrCell['col'],
             'item_id' => $intId,
         );
+    }
+
+    /**
+     * Push a database value to the passed array.
+     *
+     * @param array $value    The value from the database.
+     * @param array $result   The result list.
+     * @param int   $countCol The count of columns per row.
+     *
+     * @return void
+     */
+    private function pushValue($value, &$result, $countCol)
+    {
+        $buildRow = function (&$list, $itemId, $row) use ($countCol) {
+            for ($i = count($list); $i < $countCol; $i++) {
+                $list[$i] = [
+                    'tstamp'  => 0,
+                    'value'   => '',
+                    'att_id'  => $this->get('id'),
+                    'row'     => $row,
+                    'col'     => $i,
+                    'item_id' => $itemId,
+                ];
+            }
+        };
+
+        $itemId = $value['item_id'];
+        if (!isset($result[$itemId])) {
+            $result[$itemId] = [];
+        }
+
+        // Prepare all rows up until to this item.
+        $row = count($result[$itemId]);
+        while ($row <= $value['row']) {
+            if (!isset($result[$itemId][$row])) {
+                $result[$itemId][$row] = [];
+            }
+            $buildRow($result[$itemId][$row], $itemId, $row);
+            $row++;
+        }
+        $result[$itemId][(int) $value['row']][(int) $value['col']] = $value;
     }
 }
