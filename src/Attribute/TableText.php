@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_tabletext.
  *
- * (c) 2012-2017 The MetaModels team.
+ * (c) 2012-2018 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,8 +19,8 @@
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     David Molineus <david.molineus@netzmacht.de>
- * @copyright  2012-2017 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0
+ * @copyright  2012-2018 The MetaModels team.
+ * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -28,7 +28,6 @@ namespace MetaModels\AttributeTableTextBundle\Attribute;
 
 use Contao\System;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use MetaModels\Attribute\BaseComplex;
 use MetaModels\IMetaModel;
 
@@ -160,18 +159,7 @@ class TableText extends BaseComplex
                         continue;
                     }
 
-                    try {
-                        $this->connection->insert($this->getValueTable(), $this->getSetValues($col, $intId));
-                    } catch (DBALException $e) {
-                        $this->connection->update(
-                            $this->getValueTable(),
-                            $this->getSetValues($col, $intId),
-                            [
-                                'att_id'  => $this->get('id'),
-                                'item_id' => $intId
-                            ]
-                        );
-                    }
+                    $this->connection->insert($this->getValueTable(), $this->getSetValues($col, $intId));
                 }
             }
         }
@@ -225,7 +213,8 @@ class TableText extends BaseComplex
         $builder  = $this->connection->createQueryBuilder()
             ->select('*')
             ->from($this->getValueTable())
-            ->orderBy('row', 'ASC')
+            ->orderBy('item_id', 'ASC')
+            ->addOrderBy('row', 'ASC')
             ->addOrderBy('col', 'ASC');
 
         if ($arrWhere) {
@@ -237,13 +226,15 @@ class TableText extends BaseComplex
         }
 
         $statement = $builder->execute();
-        $arrReturn = [];
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $arrReturn[$row['item_id']][$row['row']][] = $row;
+        $countCol = count(deserialize($this->get('tabletext_cols'), true));
+        $result   = [];
+
+        while ($content = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $this->pushValue($content, $result, $countCol);
         }
 
-        return $arrReturn;
+        return $result;
     }
 
     /**
@@ -345,7 +336,7 @@ class TableText extends BaseComplex
                 $kk = str_replace('col_', '', $kk);
 
                 $newValue[$k][$kk]['value'] = $col;
-                $newValue[$k][$kk]['col']   = $kk;
+                $newValue[$k][$kk]['col']   = (int) $kk;
                 $newValue[$k][$kk]['row']   = $intRow;
             }
             $intRow++;
@@ -373,5 +364,46 @@ class TableText extends BaseComplex
             'col'     => (int) $arrCell['col'],
             'item_id' => $intId,
         );
+    }
+
+    /**
+     * Push a database value to the passed array.
+     *
+     * @param array $value    The value from the database.
+     * @param array $result   The result list.
+     * @param int   $countCol The count of columns per row.
+     *
+     * @return void
+     */
+    private function pushValue($value, &$result, $countCol)
+    {
+        $buildRow = function (&$list, $itemId, $row) use ($countCol) {
+            for ($i = count($list); $i < $countCol; $i++) {
+                $list[$i] = [
+                    'tstamp'  => 0,
+                    'value'   => '',
+                    'att_id'  => $this->get('id'),
+                    'row'     => $row,
+                    'col'     => $i,
+                    'item_id' => $itemId,
+                ];
+            }
+        };
+
+        $itemId = $value['item_id'];
+        if (!isset($result[$itemId])) {
+            $result[$itemId] = [];
+        }
+
+        // Prepare all rows up until to this item.
+        $row = count($result[$itemId]);
+        while ($row <= $value['row']) {
+            if (!isset($result[$itemId][$row])) {
+                $result[$itemId][$row] = [];
+            }
+            $buildRow($result[$itemId][$row], $itemId, $row);
+            $row++;
+        }
+        $result[$itemId][(int) $value['row']][(int) $value['col']] = $value;
     }
 }

@@ -11,7 +11,7 @@
   ],
   "type": "contao-bundle",
   "homepage": "http://now.metamodel.me/",
-  "license": "LGPL-3.0+",
+  "license": "LGPL-3.0-or-later",
   "authors": [
     {
       "name": "Christian Schiffler",
@@ -33,17 +33,17 @@
     "source": "https://github.com/MetaModels/attribute_tabletext"
   },
   "require": {
-    "php": ">=5.6",
+    "php": "^5.6 || ^7.0",
     "contao/core-bundle": "^4.4",
-    "contao-community-alliance/dc-general": "~2.1@dev",
-    "metamodels/core": "~2.1@dev",
+    "contao-community-alliance/dc-general": "^2.1@dev",
+    "metamodels/core": "^2.1@dev",
     "symfony/dependency-injection": "^3.3",
     "symfony/http-kernel": "^3.3"
   },
   "require-dev": {
-    "cyberspectrum/contao-toolbox": "~0.6",
-    "phpcq/all-tasks": "~1.1",
-    "contao/manager-bundle": "~4.4"
+    "cyberspectrum/contao-toolbox": "^0.7",
+    "phpcq/all-tasks": "^1.2",
+    "contao/manager-bundle": "^4.4"
   },
   "autoload": {
     "psr-4": {
@@ -73,8 +73,6 @@
       "dev-feature/contao4": "2.1.x-dev"
     }
   },
-  "minimum-stability": "dev",
-  "prefer-stable": true,
   "repositories": [
     {
       "type": "vcs",
