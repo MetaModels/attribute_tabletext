@@ -9,8 +9,6 @@ php:
 env:
   - CONTAO_VERSION=~3.5.5
 
-sudo: false
-
 before_script:
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - travis_retry composer self-update && composer --version
