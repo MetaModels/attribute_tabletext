@@ -40,7 +40,6 @@
     "metamodels/core": "~2.0@alpha"
   },
   "require-dev": {
-    "cyberspectrum/contao-toolbox": "~0.6",
     "phpcq/all-tasks": "~1.0",
     "metamodels/base-unit-tests": "~1.0"
   },
