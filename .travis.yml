@@ -21,7 +21,7 @@ before_script:
         && echo ${BASH_REMATCH[1]} \
         || echo dev-${TRAVIS_BRANCH})
     fi
-  - echo "Using root version $COMPOSER_ROOT_VERSION"
+  - echo "Using root version ${COMPOSER_ROOT_VERSION}"
   - travis_retry composer update --prefer-dist --no-interaction
 
 script: ant -keep-going
