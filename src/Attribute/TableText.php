@@ -26,6 +26,7 @@
 
 namespace MetaModels\AttributeTableTextBundle\Attribute;
 
+use Contao\StringUtil;
 use Contao\System;
 use Doctrine\DBAL\Connection;
 use MetaModels\Attribute\BaseComplex;
@@ -112,7 +113,7 @@ class TableText extends BaseComplex
      */
     public function getFieldDefinition($arrOverrides = array())
     {
-        $arrColLabels                        = deserialize($this->get('tabletext_cols'), true);
+        $arrColLabels                        = StringUtil::deserialize($this->get('tabletext_cols'), true);
         $arrFieldDef                         = parent::getFieldDefinition($arrOverrides);
         $arrFieldDef['inputType']            = 'multiColumnWizard';
         $arrFieldDef['eval']['columnFields'] = array();
@@ -227,7 +228,7 @@ class TableText extends BaseComplex
 
         $statement = $builder->execute();
 
-        $countCol = count(deserialize($this->get('tabletext_cols'), true));
+        $countCol = count(StringUtil::deserialize($this->get('tabletext_cols'), true));
         $result   = [];
 
         while ($content = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -304,7 +305,7 @@ class TableText extends BaseComplex
             return array();
         }
 
-        $arrColLabels = deserialize($this->get('tabletext_cols'), true);
+        $arrColLabels = StringUtil::deserialize($this->get('tabletext_cols'), true);
         $countCol     = count($arrColLabels);
         $widgetValue  = array();
 
