@@ -41,7 +41,7 @@
   },
   "require-dev": {
     "metamodels/base-unit-tests": "~1.0",
-    "phpcq/all-tasks": "~1.0"
+    "phpcq/all-tasks": "^1.2"
   },
   "autoload": {
     "psr-0": {
