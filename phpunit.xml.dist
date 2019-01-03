@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.1/phpunit.xsd"
@@ -14,8 +13,8 @@
          bootstrap="vendor/autoload.php"
 >
     <testsuites>
-        <testsuite name="MetaModels attribute tabletext tests">
-            <directory>./tests/MetaModels/</directory>
+        <testsuite name="MetaModels attribute for tabletext tests">
+            <directory>./tests</directory>
         </testsuite>
     </testsuites>
     <filter>
