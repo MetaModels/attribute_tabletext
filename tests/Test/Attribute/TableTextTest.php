@@ -23,10 +23,11 @@
 namespace MetaModels\AttributeTableTextBundle\Test\Attribute;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Statement;
 use MetaModels\AttributeTableTextBundle\Attribute\TableText;
 use PHPUnit\Framework\TestCase;
 use MetaModels\IMetaModel;
-use MetaModels\IMetaModelsServiceContainer;
 
 /**
  * Unit tests to test class TableText.
@@ -36,35 +37,37 @@ class TableTextTest extends TestCase
     /**
      * Mock a MetaModel.
      *
-     * @param string $language         The language.
-     * @param string $fallbackLanguage The fallback language.
-     *
      * @return \MetaModels\IMetaModel
      */
-    protected function mockMetaModel($language, $fallbackLanguage)
+    protected function mockMetaModel()
     {
-        $metaModel = $this->getMock(
-            'MetaModels\MetaModel',
-            array(),
-            array(array())
-        );
+        $metaModel = $this->getMockForAbstractClass(IMetaModel::class);
 
         $metaModel
-            ->expects($this->any())
             ->method('getTableName')
-            ->will($this->returnValue('mm_unittest'));
+            ->willReturn('mm_unittest');
 
         $metaModel
-            ->expects($this->any())
             ->method('getActiveLanguage')
-            ->will($this->returnValue($language));
+            ->willReturn('en');
 
         $metaModel
-            ->expects($this->any())
             ->method('getFallbackLanguage')
-            ->will($this->returnValue($fallbackLanguage));
+            ->willReturn('de');
 
         return $metaModel;
+    }
+
+    /**
+     * Mock the database connection.
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     */
+    private function mockConnection()
+    {
+        return $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     /**
@@ -74,7 +77,11 @@ class TableTextTest extends TestCase
      */
     public function testInstantiation()
     {
-        $text = new TableText($this->getMockForAbstractClass(IMetaModel::class));
+        $text = new TableText(
+            $this->getMockForAbstractClass(IMetaModel::class),
+            [],
+            $this->mockConnection()
+        );
         $this->assertInstanceOf(TableText::class, $text);
     }
 
@@ -85,38 +92,54 @@ class TableTextTest extends TestCase
      */
     public function testSavingEmptyRow()
     {
-        $mockDB    = $this->getMockBuilder(\stdClass::class)->setMethods(['prepare'])->getMock();
-        $container = $this->getMockForAbstractClass(IMetaModelsServiceContainer::class);
-        $metaModel = $this->getMockForAbstractClass(IMetaModel::class);
+        $mockDB    = $this->mockConnection();
+        $metaModel = $this->mockMetaModel();
 
-        $metaModel->method('getServiceContainer')->willReturn($container);
-        $container->method('getDatabase')->willReturn($mockDB);
+        $deleteBuilder = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
+        $deleteBuilder
+            ->expects($this->once())
+            ->method('delete')
+            ->with('tl_metamodel_tabletext')
+            ->willReturn($deleteBuilder);
+        $deleteBuilder
+            ->expects($this->once())
+            ->method('execute');
 
-        $mockQueries = $this
-            ->getMockBuilder(\stdClass::class)
-            ->setMethods(['execute', 'set'])
-            ->getMock();
+        $mockDB
+            ->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($deleteBuilder);
+        $mockDB
+            ->expects($this->exactly(6))
+            ->method('insert')
+            ->withConsecutive(
+                [
+                    'tl_metamodel_tabletext',
+                    ['tstamp' => time(), 'value' => '1', 'att_id' => 42, 'row' => 0, 'col' => 0, 'item_id' => 21]
+                ],
+                [
+                    'tl_metamodel_tabletext',
+                    ['tstamp' => time(), 'value' => '2', 'att_id' => 42, 'row' => 0, 'col' => 1, 'item_id' => 21]
+                ],
+                [
+                    'tl_metamodel_tabletext',
+                    ['tstamp' => time(), 'value' => '3', 'att_id' => 42, 'row' => 0, 'col' => 2, 'item_id' => 21]
+                ],
+                [
+                    'tl_metamodel_tabletext',
+                    ['tstamp' => time(), 'value' => '4', 'att_id' => 42, 'row' => 2, 'col' => 0, 'item_id' => 21]
+                ],
+                [
+                    'tl_metamodel_tabletext',
+                    ['tstamp' => time(), 'value' => '5', 'att_id' => 42, 'row' => 2, 'col' => 1, 'item_id' => 21]
+                ],
+                [
+                    'tl_metamodel_tabletext',
+                    ['tstamp' => time(), 'value' => '6', 'att_id' => 42, 'row' => 2, 'col' => 2, 'item_id' => 21]
+                ]
+            );
 
-        $mockQueries->expects($this->exactly(6))->method('set')->withConsecutive(
-            [['tstamp' => time(), 'value' => '1', 'att_id' => 42, 'row' => 0, 'col' => 0, 'item_id' => 21]],
-            [['tstamp' => time(), 'value' => '2', 'att_id' => 42, 'row' => 0, 'col' => 1, 'item_id' => 21]],
-            [['tstamp' => time(), 'value' => '3', 'att_id' => 42, 'row' => 0, 'col' => 2, 'item_id' => 21]],
-            [['tstamp' => time(), 'value' => '4', 'att_id' => 42, 'row' => 2, 'col' => 0, 'item_id' => 21]],
-            [['tstamp' => time(), 'value' => '5', 'att_id' => 42, 'row' => 2, 'col' => 1, 'item_id' => 21]],
-            [['tstamp' => time(), 'value' => '6', 'att_id' => 42, 'row' => 2, 'col' => 2, 'item_id' => 21]]
-        )->willReturn($mockQueries);
-
-        $mockDB->expects($this->exactly(7))->method('prepare')->withConsecutive(
-            ['DELETE FROM tl_metamodel_tabletext WHERE att_id=? AND item_id IN (21)'],
-            ['INSERT INTO tl_metamodel_tabletext %s'],
-            ['INSERT INTO tl_metamodel_tabletext %s'],
-            ['INSERT INTO tl_metamodel_tabletext %s'],
-            ['INSERT INTO tl_metamodel_tabletext %s'],
-            ['INSERT INTO tl_metamodel_tabletext %s'],
-            ['INSERT INTO tl_metamodel_tabletext %s']
-        )->willReturn($mockQueries);
-
-        $text = new TableText($metaModel, ['id' => 42]);
+        $text = new TableText($metaModel, ['id' => 42], $mockDB);
 
         $text->setDataFor(
             [
@@ -148,38 +171,53 @@ class TableTextTest extends TestCase
      */
     public function testRetrievingEmptyRow()
     {
-        $mockDB    = $this->getMockBuilder(\stdClass::class)->setMethods(['prepare'])->getMock();
-        $container = $this->getMockForAbstractClass(IMetaModelsServiceContainer::class);
-        $metaModel = $this->getMockForAbstractClass(IMetaModel::class);
+        $mockDB    = $this->mockConnection();
+        $metaModel = $this->mockMetaModel();
 
-        $metaModel->method('getServiceContainer')->willReturn($container);
-        $container->method('getDatabase')->willReturn($mockDB);
-
-        $mockResult = $this->getMockBuilder(\stdClass::class)->setMethods(['next', 'row'])->getMock();
-
-        $mockResult->expects($this->exactly(6))->method('next')
-            ->willReturnOnConsecutiveCalls(true, true, true, true, true, false);
-        $mockResult->method('row')->willReturnOnConsecutiveCalls(
-            ['tstamp' => 123456789, 'value' => '1', 'att_id' => 42, 'row' => 0, 'col' => 0, 'item_id' => 21],
-            ['tstamp' => 123456789, 'value' => '2', 'att_id' => 42, 'row' => 0, 'col' => 1, 'item_id' => 21],
-            ['tstamp' => 123456789, 'value' => '3', 'att_id' => 42, 'row' => 0, 'col' => 2, 'item_id' => 21],
-            ['tstamp' => 123456789, 'value' => '4', 'att_id' => 42, 'row' => 2, 'col' => 0, 'item_id' => 21],
-            ['tstamp' => 123456789, 'value' => '6', 'att_id' => 42, 'row' => 2, 'col' => 2, 'item_id' => 21]
-        );
-
-        $mockQueries = $this
-            ->getMockBuilder(\stdClass::class)
-            ->setMethods(['execute', 'set'])
-            ->getMock();
-        $mockQueries->method('execute')->with([42])->willReturn($mockResult);
-
-
+        $selectBuilder = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
         $mockDB
             ->expects($this->once())
-            ->method('prepare')
-            ->with('SELECT * FROM tl_metamodel_tabletext WHERE att_id=? AND item_id IN (21) ' .
-                'ORDER BY item_id ASC, row ASC, col ASC')
-            ->willReturn($mockQueries);
+            ->method('createQueryBuilder')
+            ->willReturn($selectBuilder);
+
+        $selectBuilder
+            ->expects($this->once())
+            ->method('select')
+            ->with('*')
+            ->willReturn($selectBuilder);
+        $selectBuilder
+            ->expects($this->once())
+            ->method('from')
+            ->with('tl_metamodel_tabletext')
+            ->willReturn($selectBuilder);
+        $selectBuilder
+            ->expects($this->once())
+            ->method('orderBy')
+            ->with('item_id', 'ASC')
+            ->willReturn($selectBuilder);
+        $selectBuilder
+            ->expects($this->exactly(2))
+            ->method('addOrderBy')
+            ->withConsecutive(['row', 'ASC'], ['col', 'ASC'])
+            ->willReturn($selectBuilder);
+
+        $selectStatement = $this->getMockBuilder(Statement::class)->disableOriginalConstructor()->getMock();
+        $selectStatement
+            ->expects($this->exactly(6))
+            ->method('fetch')
+            ->willReturnOnConsecutiveCalls(
+                ['tstamp' => 123456789, 'value' => '1', 'att_id' => 42, 'row' => 0, 'col' => 0, 'item_id' => 21],
+                ['tstamp' => 123456789, 'value' => '2', 'att_id' => 42, 'row' => 0, 'col' => 1, 'item_id' => 21],
+                ['tstamp' => 123456789, 'value' => '3', 'att_id' => 42, 'row' => 0, 'col' => 2, 'item_id' => 21],
+                ['tstamp' => 123456789, 'value' => '4', 'att_id' => 42, 'row' => 2, 'col' => 0, 'item_id' => 21],
+                ['tstamp' => 123456789, 'value' => '6', 'att_id' => 42, 'row' => 2, 'col' => 2, 'item_id' => 21],
+                null
+            );
+
+        $selectBuilder
+            ->expects($this->once())
+            ->method('execute')
+            ->willReturn($selectStatement);
 
         $text = new TableText(
             $metaModel,
@@ -192,7 +230,8 @@ class TableTextTest extends TestCase
                         2 => ['rowLabel' => 'C', 'rowStyle' => '100px'],
                     ]
                 )
-            ]
+            ],
+            $mockDB
         );
 
         $this->assertEquals(
@@ -224,6 +263,7 @@ class TableTextTest extends TestCase
      */
     public function testValueToWidget()
     {
+        $mockDB    = $this->mockConnection();
         $metaModel = $this->getMockForAbstractClass(IMetaModel::class);
 
         $text = new TableText(
@@ -237,7 +277,8 @@ class TableTextTest extends TestCase
                         2 => ['rowLabel' => 'C', 'rowStyle' => '100px'],
                     ]
                 )
-            ]
+            ],
+            $mockDB
         );
 
         $this->assertEquals(
