@@ -1,19 +1,19 @@
 ignore:
-  - "Mini Model <minimodel@metamodel.me>"
-  - "Scrutinizer Auto-Fixer <auto-fixer@scrutinizer-ci.com>"
+  - 'Mini Model <minimodel@metamodel.me>'
+  - 'Scrutinizer Auto-Fixer <auto-fixer@scrutinizer-ci.com>'
 
 exclude:
-  languages
+  - /^src\/Resources\/contao\/languages/
 
 mapping:
-  "Andreas Isaak <info@andreas-isaak.de>": "Andreas Isaak <andy.jared@googlemail.com>"
-  "Christopher Boelter <christopher@boelter.eu>": "cboelter <christopher@boelter.eu>"
+  'Andreas Isaak <info@andreas-isaak.de>': 'Andreas Isaak <andy.jared@googlemail.com>'
+  'Christopher Boelter <christopher@boelter.eu>': 'cboelter <christopher@boelter.eu>'
 
 copy-left:
-   "David Maack <david.maack@arcor.de>":
-     - contao/config/config.php
-     - contao/config/autoload.php
-     - contao/dca/tl_metamodel_attribute.php
-     - contao/dca/tl_metamodel_dcasetting.php
-     - contao/dca/tl_metamodel_filtersetting.php
-     - contao/dca/tl_metamodel_rendersetting.php
+  'David Maack <david.maack@arcor.de>':
+    - contao/config/config.php
+    - contao/config/autoload.php
+    - contao/dca/tl_metamodel_attribute.php
+    - contao/dca/tl_metamodel_dcasetting.php
+    - contao/dca/tl_metamodel_filtersetting.php
+    - contao/dca/tl_metamodel_rendersetting.php
