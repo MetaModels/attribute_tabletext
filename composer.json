@@ -42,7 +42,8 @@
   },
   "require-dev": {
     "contao/manager-bundle": "^4.4",
-    "phpcq/all-tasks": "^1.2"
+    "phpcq/all-tasks": "^1.2",
+    "menatwork/contao-multicolumnwizard-bundle": "^3.4.0@beta"
   },
   "autoload": {
     "psr-4": {
@@ -64,12 +65,6 @@
       "dev-feature/contao4": "2.1.x-dev"
     }
   },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "git@gitlab.com:metamodels/core.git"
-    }
-  ],
   "config": {
     "sort-packages": true
   }
