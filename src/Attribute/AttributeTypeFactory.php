@@ -13,13 +13,15 @@
  * @package    MetaModels/attribute_tabletext
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @author     David Molineus <david.molineus@netzmacht.de>
  * @copyright  2012-2019 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
-namespace MetaModels\Attribute\TableText;
+namespace MetaModels\AttributeTableTextBundle\Attribute;
 
+use Doctrine\DBAL\Connection;
 use MetaModels\Attribute\AbstractAttributeTypeFactory;
 
 /**
@@ -28,14 +30,30 @@ use MetaModels\Attribute\AbstractAttributeTypeFactory;
 class AttributeTypeFactory extends AbstractAttributeTypeFactory
 {
     /**
+     * Database connection.
+     *
+     * @var Connection
+     */
+    private $connection;
+
+    /**
      * {@inheritDoc}
      */
-    public function __construct()
+    public function __construct(Connection $connection)
     {
         parent::__construct();
 
-        $this->typeName  = 'tabletext';
-        $this->typeIcon  = 'system/modules/metamodelsattribute_tabletext/html/tabletext.png';
-        $this->typeClass = 'MetaModels\Attribute\TableText\TableText';
+        $this->connection = $connection;
+        $this->typeName   = 'tabletext';
+        $this->typeIcon   = 'bundles/metamodelsattributetabletext/tabletext.png';
+        $this->typeClass  = TableText::class;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function createInstance($information, $metaModel)
+    {
+        return new $this->typeClass($metaModel, $information, $this->connection);
     }
 }

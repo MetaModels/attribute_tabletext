@@ -16,14 +16,14 @@
  * @author     David Maack <david.maack@arcor.de>
  * @author     David Greminger <david.greminger@1up.io>
  * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @author     David Molineus <david.molineus@netzmacht.de>
  * @copyright  2012-2019 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
-/**
- * Register the templates
- */
-TemplateLoader::addFiles(array(
-    'mm_attr_tabletext'              => 'system/modules/metamodelsattribute_tabletext/templates',
-));
+$GLOBALS['TL_DCA']['tl_metamodel_dcasetting']['metasubselectpalettes']['attr_id']['tabletext'] = array(
+    'presentation' => array(
+        'tl_class',
+    ),
+);

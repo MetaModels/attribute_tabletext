@@ -5,6 +5,6 @@ foreach ((array) $this->raw as $k => $row)
 	{
 		echo (($kk !=0) ? ' ': '' ).$col['value'];
 	}
-	if ($k != (count($this->raw['value']) -1)) echo "\n";
+	if ($k != (count((array) $this->raw['value']) -1)) echo "\n";
 }
 ?>

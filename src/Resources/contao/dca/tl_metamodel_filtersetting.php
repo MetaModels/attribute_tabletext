@@ -16,26 +16,15 @@
  * @author     David Maack <david.maack@arcor.de>
  * @author     David Greminger <david.greminger@1up.io>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @author     David Molineus <david.molineus@netzmacht.de>
  * @copyright  2012-2019 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
-$GLOBALS['TL_DCA']['tl_metamodel_rendersetting']['metapalettes']['tabletext extends default'] = array
-(
-    '+advanced' => array('tabletext_hide_tablehead'),
-);
+/**
+ * Table tl_metamodel_filtersetting
+ */
 
-
-$GLOBALS['TL_DCA']['tl_metamodel_rendersetting']['fields']['tabletext_hide_tablehead'] = array
-(
-    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_rendersetting']['tabletext_hide_tablehead'],
-    'exclude'   => true,
-    'inputType' => 'checkbox',
-    'eval'      => array
-    (
-        'tl_class' => 'clr w50'
-    ),
-    'sql'       => 'varchar(1) NOT NULL default \'0\''
-);
+$GLOBALS['TL_DCA']['tl_metamodel_filtersetting']['simplelookup_palettes']['tabletext'] =
+    &$GLOBALS['TL_DCA']['tl_metamodel_filtersetting']['simplelookup_palettes']['_translated_'];
