@@ -79,7 +79,7 @@ class TableText extends BaseComplex
      */
     public function searchFor($strPattern)
     {
-        $query     = 'SELECT DISTINCT item_id FROM %1$s WHERE value LIKE :value AND att_id = :id';
+        $query     = 'SELECT DISTINCT t.item_id FROM %1$s AS t WHERE value LIKE :value AND t.att_id = :id';
         $statement = $this->connection->prepare($query);
         $statement->bindValue('value', str_replace(array('*', '?'), array('%', '_'), $strPattern));
         $statement->bindValue('id', $this->get('id'));
@@ -174,18 +174,18 @@ class TableText extends BaseComplex
     public function getFilterOptions($idList, $usedOnly, &$arrCount = null)
     {
         $builder = $this->connection->createQueryBuilder()
-            ->select('value, COUNT(value) as mm_count')
-            ->from($this->getValueTable())
-            ->andWhere('att_id = :att_id')
+            ->select('t.value, COUNT(t.value) as mm_count')
+            ->from($this->getValueTable(), 't')
+            ->andWhere('t.att_id = :att_id')
             ->setParameter('att_id', $this->get('id'))
-            ->groupBy('value');
+            ->groupBy('t.value');
 
 
         if ($idList) {
             $builder
-                ->andWhere('item_id IN (:id_list)')
+                ->andWhere('t.item_id IN (:id_list)')
 
-                ->orderBy('FIELD(id,:id_list)')
+                ->orderBy('FIELD(t.id,:id_list)')
                 ->setParameter('id_list', $idList, Connection::PARAM_INT_ARRAY);
         }
 
@@ -213,10 +213,10 @@ class TableText extends BaseComplex
         $arrWhere = $this->getWhere($arrIds);
         $builder  = $this->connection->createQueryBuilder()
             ->select('*')
-            ->from($this->getValueTable())
-            ->orderBy('item_id', 'ASC')
-            ->addOrderBy('row', 'ASC')
-            ->addOrderBy('col', 'ASC');
+            ->from($this->getValueTable(), 't')
+            ->orderBy('t.item_id', 'ASC')
+            ->addOrderBy('t.row', 'ASC')
+            ->addOrderBy('t.col', 'ASC');
 
         if ($arrWhere) {
             $builder->andWhere($arrWhere['procedure']);
@@ -276,21 +276,21 @@ class TableText extends BaseComplex
         $strRowCol   = '';
         if ($mixIds) {
             if (is_array($mixIds)) {
-                $strWhereIds = ' AND item_id IN (' . implode(',', $mixIds) . ')';
+                $strWhereIds = ' AND t.item_id IN (' . implode(',', $mixIds) . ')';
             } else {
-                $strWhereIds = ' AND item_id=' . $mixIds;
+                $strWhereIds = ' AND t.item_id=' . $mixIds;
             }
         }
 
         if (is_int($intRow) && is_int($intCol)) {
-            $strRowCol = ' AND row = :row AND col = :col';
+            $strRowCol = ' AND t.row = :row AND t.col = :col';
         }
 
         $arrReturn = array(
-            'procedure' => 'att_id=:att_id' . $strWhereIds . $strRowCol,
+            'procedure' => 't.att_id=:att_id' . $strWhereIds . $strRowCol,
             'params' => ($strRowCol)
-                ? array('att_id' => $this->get('id'), 'row' => $intRow, 'col' => $intCol)
-                : array('att_id' => $this->get('id')),
+                ? array('t.att_id' => $this->get('id'), 't.row' => $intRow, 't.col' => $intCol)
+                : array('t.att_id' => $this->get('id')),
         );
 
         return $arrReturn;
