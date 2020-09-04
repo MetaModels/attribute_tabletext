@@ -79,7 +79,8 @@ class TableText extends BaseComplex
      */
     public function searchFor($strPattern)
     {
-        $query     = 'SELECT DISTINCT t.item_id FROM %1$s AS t WHERE value LIKE :value AND t.att_id = :id';
+        $query     =
+            'SELECT DISTINCT t.item_id FROM tl_metamodel_tabletext AS t WHERE value LIKE :value AND t.att_id = :id';
         $statement = $this->connection->prepare($query);
         $statement->bindValue('value', str_replace(array('*', '?'), array('%', '_'), $strPattern));
         $statement->bindValue('id', $this->get('id'));
