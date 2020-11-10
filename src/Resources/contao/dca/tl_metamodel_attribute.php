@@ -59,7 +59,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tabletext_minCount'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_minCount'],
     'exclude'   => true,
     'inputType' => 'text',
-    'eval'      => ['rgxp' => 'digit', 'maxlength' => 255, 'tl_class' => 'clr w50'],
+    'eval'      => ['rgxp' => 'natural', 'maxlength' => 255, 'tl_class' => 'clr w50'],
     'sql'       => 'smallint(5) NOT NULL default \'0\''
 ];
 
@@ -67,7 +67,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tabletext_maxCount'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_maxCount'],
     'exclude'   => true,
     'inputType' => 'text',
-    'eval'      => ['rgxp' => 'digit', 'maxlength' => 255, 'tl_class' => 'w50'],
+    'eval'      => ['rgxp' => 'natural', 'maxlength' => 255, 'tl_class' => 'w50'],
     'sql'       => 'smallint(5) NOT NULL default \'0\''
 ];
 
