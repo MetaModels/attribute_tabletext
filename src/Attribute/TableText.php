@@ -96,7 +96,7 @@ class TableText extends BaseComplex
     {
         return array_merge(
             parent::getAttributeSettingNames(),
-            ['tabletext_cols',]
+            ['tabletext_cols', 'tabletext_minCount', 'tabletext_maxCount', 'tabletext_disable_sorting']
         );
     }
 
@@ -115,9 +115,20 @@ class TableText extends BaseComplex
      */
     public function getFieldDefinition($arrOverrides = [])
     {
-        $arrColLabels                        = StringUtil::deserialize($this->get('tabletext_cols'), true);
-        $arrFieldDef                         = parent::getFieldDefinition($arrOverrides);
-        $arrFieldDef['inputType']            = 'multiColumnWizard';
+        $arrColLabels                    = StringUtil::deserialize($this->get('tabletext_cols'), true);
+        $arrFieldDef                     = parent::getFieldDefinition($arrOverrides);
+        $arrFieldDef['inputType']        = 'multiColumnWizard';
+        $arrFieldDef['eval']['minCount'] = $this->get('tabletext_minCount') ?: '0';
+        $arrFieldDef['eval']['maxCount'] = $this->get('tabletext_maxCount') ?: '0';
+
+        if ($this->get('tabletext_disable_sorting')) {
+            $arrFieldDef['eval']['buttons'] = [
+                'move' => false,
+                'up'   => false,
+                'down' => false
+            ];
+        }
+
         $arrFieldDef['eval']['columnFields'] = [];
 
         $countCol = count($arrColLabels);
@@ -192,7 +203,7 @@ class TableText extends BaseComplex
 
         $statement = $builder->execute();
 
-        $arrResult = array();
+        $arrResult = [];
         while ($objRow = $statement->fetch(\PDO::FETCH_OBJ)) {
             $strValue = $objRow->value;
 
@@ -366,14 +377,14 @@ class TableText extends BaseComplex
      */
     protected function getSetValues($arrCell, $intId)
     {
-        return array(
+        return [
             'tstamp'  => time(),
             'value'   => (string) $arrCell['value'],
             'att_id'  => $this->get('id'),
             'row'     => (int) $arrCell['row'],
             'col'     => (int) $arrCell['col'],
             'item_id' => $intId,
-        );
+        ];
     }
 
     /**

@@ -28,7 +28,7 @@
  */
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['tabletext extends _complexattribute_'] = [
-    '+advanced' => ['tabletext_cols'],
+    '+advanced' => ['tabletext_cols', 'tabletext_minCount', 'tabletext_maxCount', 'tabletext_disable_sorting'],
 ];
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tabletext_cols'] = [
@@ -42,15 +42,39 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tabletext_cols'] = [
             'rowLabel' => [
                 'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_rowLabel'],
                 'inputType' => 'text',
-                'eval'      => ['allowHtml' => false, 'style' => 'width: 500px;'],
+                'eval'      => ['allowHtml' => false, 'style' => 'width: 100%;'],
             ],
             'rowStyle' => [
                 'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_rowStyle'],
                 'inputType' => 'text',
-                'eval'      => ['allowHtml' => false, 'style' => 'width: 90px;'],
+                'eval'      => ['allowHtml' => false, 'style' => 'width: 100%;'],
             ],
         ],
         'tl_class'     => 'clr w50',
     ],
     'sql'       => 'blob NULL'
+];
+
+$GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tabletext_minCount'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_minCount'],
+    'exclude'   => true,
+    'inputType' => 'text',
+    'eval'      => ['rgxp' => 'natural', 'maxlength' => 255, 'tl_class' => 'clr w50'],
+    'sql'       => 'smallint(5) NOT NULL default \'0\''
+];
+
+$GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tabletext_maxCount'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_maxCount'],
+    'exclude'   => true,
+    'inputType' => 'text',
+    'eval'      => ['rgxp' => 'natural', 'maxlength' => 255, 'tl_class' => 'w50'],
+    'sql'       => 'smallint(5) NOT NULL default \'0\''
+];
+
+$GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tabletext_disable_sorting'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tabletext_disable_sorting'],
+    'exclude'   => true,
+    'inputType' => 'checkbox',
+    'eval'      => ['tl_class' => 'clr w50 cbx m12'],
+    'sql'       => 'char(1) NOT NULL default \'\''
 ];
