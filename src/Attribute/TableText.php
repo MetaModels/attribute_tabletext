@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_tabletext.
  *
- * (c) 2012-2020 The MetaModels team.
+ * (c) 2012-2022 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,7 +19,7 @@
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
- * @copyright  2012-2020 The MetaModels team.
+ * @copyright  2012-2022 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -370,7 +370,6 @@ class TableText extends BaseComplex
      * Calculate the array of query parameters for the given cell.
      *
      * @param array $arrCell The cell to calculate.
-     *
      * @param int   $intId   The data set id.
      *
      * @return array
@@ -378,12 +377,12 @@ class TableText extends BaseComplex
     protected function getSetValues($arrCell, $intId)
     {
         return [
-            'tstamp'  => time(),
-            'value'   => (string) $arrCell['value'],
-            'att_id'  => $this->get('id'),
-            'row'     => (int) $arrCell['row'],
-            'col'     => (int) $arrCell['col'],
-            'item_id' => $intId,
+            $this->getValueTable() . '.tstamp'  => time(),
+            $this->getValueTable() . '.value'   => (string) $arrCell['value'],
+            $this->getValueTable() . '.att_id'  => $this->get('id'),
+            $this->getValueTable() . '.row'     => (int) $arrCell['row'],
+            $this->getValueTable() . '.col'     => (int) $arrCell['col'],
+            $this->getValueTable() . '.item_id' => $intId,
         ];
     }
 
