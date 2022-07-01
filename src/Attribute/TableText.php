@@ -168,11 +168,6 @@ class TableText extends BaseComplex
             foreach ((array) $arrValues[$intId] as $row) {
                 // Walk every column and update / insert the value.
                 foreach ($row as $col) {
-                    // Skip empty cols but preserve cols containing '0'.
-                    if ($this->getSetValues($col, $intId)['value'] === '') {
-                        continue;
-                    }
-
                     $this->connection->insert($this->getValueTable(), $this->getSetValues($col, $intId));
                 }
             }
