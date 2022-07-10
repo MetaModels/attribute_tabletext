@@ -84,9 +84,9 @@ class TableText extends BaseComplex
         $statement = $this->connection->prepare($query);
         $statement->bindValue('value', str_replace(['*', '?'], ['%', '_'], $strPattern));
         $statement->bindValue('id', $this->get('id'));
-        $statement->execute();
+        $statement->executeQuery();
 
-        return $statement->fetchAll(\PDO::FETCH_COLUMN, 'item_id');
+        return $statement->fetchFirstColumn();
     }
 
     /**
@@ -196,14 +196,14 @@ class TableText extends BaseComplex
                 ->setParameter('id_list', $idList, Connection::PARAM_INT_ARRAY);
         }
 
-        $statement = $builder->execute();
+        $statement = $builder->executeQuery();
 
         $arrResult = [];
-        while ($objRow = $statement->fetch(\PDO::FETCH_OBJ)) {
-            $strValue = $objRow->value;
+        while ($objRow = $statement->fetchAssociative()) {
+            $strValue = $objRow['value'];
 
             if (is_array($arrCount)) {
-                $arrCount[$strValue] = $objRow->mm_count;
+                $arrCount[$strValue] = $objRow['mm_count'];
             }
 
             $arrResult[$strValue] = $strValue;
@@ -233,12 +233,12 @@ class TableText extends BaseComplex
             }
         }
 
-        $statement = $builder->execute();
+        $statement = $builder->executeQuery();
 
         $countCol = count(StringUtil::deserialize($this->get('tabletext_cols'), true));
         $result   = [];
 
-        while ($content = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        while ($content = $statement->fetchAssociative()) {
             $this->pushValue($content, $result, $countCol);
         }
 
