@@ -331,9 +331,9 @@ class TableText extends BaseComplex
 
         foreach ($varValue as $k => $row) {
             for ($kk = 0; $kk < $countCol; $kk++) {
-                $i = array_search($kk, array_column($row, 'col'));
+                $index = array_search($kk, array_column($row, 'col'));
 
-                $widgetValue[$k]['col_' . $kk] = ($i !== false) ? $row[$i]['value'] : '';
+                $widgetValue[$k]['col_' . $kk] = ($index !== false) ? $row[$index]['value'] : '';
             }
         }
 
