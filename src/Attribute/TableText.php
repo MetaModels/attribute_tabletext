@@ -19,6 +19,7 @@
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @author     Sven Baumann <baumann.sv@gmail.com>
  * @copyright  2012-2022 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
@@ -169,7 +170,7 @@ class TableText extends BaseComplex
                 // Walk every column and update / insert the value.
                 foreach ($row as $col) {
                     // Skip empty cols but preserve cols containing '0'.
-                    if ($this->getSetValues($col, $intId)['value'] === '') {
+                    if ($this->getSetValues($col, $intId)[$this->getValueTable() . '.value'] === '') {
                         continue;
                     }
 
