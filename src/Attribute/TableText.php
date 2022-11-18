@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_tabletext.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2022 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,7 +19,8 @@
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
- * @copyright  2012-2019 The MetaModels team.
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @copyright  2012-2022 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -79,9 +80,10 @@ class TableText extends BaseComplex
      */
     public function searchFor($strPattern)
     {
-        $query     = 'SELECT DISTINCT item_id FROM %1$s WHERE value LIKE :value AND att_id = :id';
+        $query     =
+            'SELECT DISTINCT t.item_id FROM tl_metamodel_tabletext AS t WHERE value LIKE :value AND t.att_id = :id';
         $statement = $this->connection->prepare($query);
-        $statement->bindValue('value', str_replace(array('*', '?'), array('%', '_'), $strPattern));
+        $statement->bindValue('value', str_replace(['*', '?'], ['%', '_'], $strPattern));
         $statement->bindValue('id', $this->get('id'));
         $statement->execute();
 
@@ -93,9 +95,10 @@ class TableText extends BaseComplex
      */
     public function getAttributeSettingNames()
     {
-        return array_merge(parent::getAttributeSettingNames(), array(
-            'tabletext_cols',
-        ));
+        return array_merge(
+            parent::getAttributeSettingNames(),
+            ['tabletext_cols', 'tabletext_minCount', 'tabletext_maxCount', 'tabletext_disable_sorting']
+        );
     }
 
     /**
@@ -111,20 +114,31 @@ class TableText extends BaseComplex
     /**
      * {@inheritdoc}
      */
-    public function getFieldDefinition($arrOverrides = array())
+    public function getFieldDefinition($arrOverrides = [])
     {
-        $arrColLabels                        = StringUtil::deserialize($this->get('tabletext_cols'), true);
-        $arrFieldDef                         = parent::getFieldDefinition($arrOverrides);
-        $arrFieldDef['inputType']            = 'multiColumnWizard';
-        $arrFieldDef['eval']['columnFields'] = array();
+        $arrColLabels                    = StringUtil::deserialize($this->get('tabletext_cols'), true);
+        $arrFieldDef                     = parent::getFieldDefinition($arrOverrides);
+        $arrFieldDef['inputType']        = 'multiColumnWizard';
+        $arrFieldDef['eval']['minCount'] = $this->get('tabletext_minCount') ?: '0';
+        $arrFieldDef['eval']['maxCount'] = $this->get('tabletext_maxCount') ?: '0';
+
+        if ($this->get('tabletext_disable_sorting')) {
+            $arrFieldDef['eval']['buttons'] = [
+                'move' => false,
+                'up'   => false,
+                'down' => false
+            ];
+        }
+
+        $arrFieldDef['eval']['columnFields'] = [];
 
         $countCol = count($arrColLabels);
         for ($i = 0; $i < $countCol; $i++) {
-            $arrFieldDef['eval']['columnFields']['col_' . $i] = array(
+            $arrFieldDef['eval']['columnFields']['col_' . $i] = [
                 'label'     => $arrColLabels[$i]['rowLabel'],
                 'inputType' => 'text',
-                'eval'      => array(),
-            );
+                'eval'      => [],
+            ];
             if ($arrColLabels[$i]['rowStyle']) {
                 $arrFieldDef['eval']['columnFields']['col_' . $i]['eval']['style'] =
                     'width:' . $arrColLabels[$i]['rowStyle'];
@@ -156,7 +170,7 @@ class TableText extends BaseComplex
                 // Walk every column and update / insert the value.
                 foreach ($row as $col) {
                     // Skip empty cols but preserve cols containing '0'.
-                    if ($this->getSetValues($col, $intId)['value'] === '') {
+                    if ($this->getSetValues($col, $intId)[$this->getValueTable() . '.value'] === '') {
                         continue;
                     }
 
@@ -174,24 +188,23 @@ class TableText extends BaseComplex
     public function getFilterOptions($idList, $usedOnly, &$arrCount = null)
     {
         $builder = $this->connection->createQueryBuilder()
-            ->select('value, COUNT(value) as mm_count')
-            ->from($this->getValueTable())
-            ->andWhere('att_id = :att_id')
+            ->select('t.value, COUNT(t.value) as mm_count')
+            ->from($this->getValueTable(), 't')
+            ->andWhere('t.att_id = :att_id')
             ->setParameter('att_id', $this->get('id'))
-            ->groupBy('value');
+            ->groupBy('t.value');
 
 
         if ($idList) {
             $builder
-                ->andWhere('item_id IN (:id_list)')
-
-                ->orderBy('FIELD(id,:id_list)')
+                ->andWhere('t.item_id IN (:id_list)')
+                ->orderBy('FIELD(t.id,:id_list)')
                 ->setParameter('id_list', $idList, Connection::PARAM_INT_ARRAY);
         }
 
         $statement = $builder->execute();
 
-        $arrResult = array();
+        $arrResult = [];
         while ($objRow = $statement->fetch(\PDO::FETCH_OBJ)) {
             $strValue = $objRow->value;
 
@@ -210,13 +223,13 @@ class TableText extends BaseComplex
      */
     public function getDataFor($arrIds)
     {
-        $arrWhere = $this->getWhere($arrIds);
+        $arrWhere = $this->getWhere($arrIds, null, null, 't');
         $builder  = $this->connection->createQueryBuilder()
             ->select('*')
-            ->from($this->getValueTable())
-            ->orderBy('item_id', 'ASC')
-            ->addOrderBy('row', 'ASC')
-            ->addOrderBy('col', 'ASC');
+            ->from($this->getValueTable(), 't')
+            ->orderBy('t.item_id', 'ASC')
+            ->addOrderBy('t.row', 'ASC')
+            ->addOrderBy('t.col', 'ASC');
 
         if ($arrWhere) {
             $builder->andWhere($arrWhere['procedure']);
@@ -243,7 +256,7 @@ class TableText extends BaseComplex
      */
     public function unsetDataFor($arrIds)
     {
-        $arrWhere = $this->getWhere($arrIds);
+        $arrWhere = $this->getWhere($arrIds, null, null, $this->getValueTable());
 
         $builder = $this->connection->createQueryBuilder()
             ->delete($this->getValueTable());
@@ -262,38 +275,46 @@ class TableText extends BaseComplex
     /**
      * Build a where clause for the given id(s) and rows/cols.
      *
-     * @param mixed    $mixIds One, none or many ids to use.
+     * @param mixed    $mixIds     One, none or many ids to use.
      *
-     * @param int|null $intRow The row number, optional.
+     * @param int|null $intRow     The row number, optional.
      *
-     * @param int|null $intCol The col number, optional.
+     * @param int|null $intCol     The col number, optional.
+     *
+     * @param null     $tableAlias The table alias.
      *
      * @return array<string,string|array>
      */
-    protected function getWhere($mixIds, $intRow = null, $intCol = null)
+    protected function getWhere($mixIds, $intRow = null, $intCol = null, $tableAlias = null)
     {
+        if (null !== $tableAlias) {
+            $tableAlias .= '.';
+        }
+
         $strWhereIds = '';
         $strRowCol   = '';
         if ($mixIds) {
             if (is_array($mixIds)) {
-                $strWhereIds = ' AND item_id IN (' . implode(',', $mixIds) . ')';
+                $strWhereIds = ' AND ' . $tableAlias . 'item_id IN (' . implode(',', $mixIds) . ')';
             } else {
-                $strWhereIds = ' AND item_id=' . $mixIds;
+                $strWhereIds = ' AND ' . $tableAlias . 'item_id=' . $mixIds;
             }
         }
 
         if (is_int($intRow) && is_int($intCol)) {
-            $strRowCol = ' AND row = :row AND col = :col';
+            $strRowCol = ' AND ' . $tableAlias . 'row = :row AND ' . $tableAlias . 'col = :col';
         }
 
-        $arrReturn = array(
-            'procedure' => 'att_id=:att_id' . $strWhereIds . $strRowCol,
-            'params' => ($strRowCol)
-                ? array('att_id' => $this->get('id'), 'row' => $intRow, 'col' => $intCol)
-                : array('att_id' => $this->get('id')),
-        );
-
-        return $arrReturn;
+        return [
+            'procedure' => $tableAlias . 'att_id=:att_id' . $strWhereIds . $strRowCol,
+            'params'    => ($strRowCol)
+                ? [
+                    'att_id' => $this->get('id'),
+                    'row'    => $intRow,
+                    'col'    => $intCol
+                ]
+                : ['att_id' => $this->get('id')],
+        ];
     }
 
     /**
@@ -302,18 +323,18 @@ class TableText extends BaseComplex
     public function valueToWidget($varValue)
     {
         if (!is_array($varValue)) {
-            return array();
+            return [];
         }
 
         $arrColLabels = StringUtil::deserialize($this->get('tabletext_cols'), true);
         $countCol     = count($arrColLabels);
-        $widgetValue  = array();
+        $widgetValue  = [];
 
         foreach ($varValue as $k => $row) {
             for ($kk = 0; $kk < $countCol; $kk++) {
-                $i = array_search($kk, array_column($row, 'col'));
+                $index = array_search($kk, array_column($row, 'col'));
 
-                $widgetValue[$k]['col_' . $kk] = ($i !== false) ? $row[$i]['value'] : '';
+                $widgetValue[$k]['col_' . $kk] = ($index !== false) ? $row[$index]['value'] : '';
             }
         }
 
@@ -326,10 +347,10 @@ class TableText extends BaseComplex
     public function widgetToValue($varValue, $itemId)
     {
         if (!is_array($varValue)) {
-            return array();
+            return [];
         }
 
-        $newValue = array();
+        $newValue = [];
         // Start row numerator at 0.
         $intRow = 0;
         foreach ($varValue as $k => $row) {
@@ -350,21 +371,20 @@ class TableText extends BaseComplex
      * Calculate the array of query parameters for the given cell.
      *
      * @param array $arrCell The cell to calculate.
-     *
      * @param int   $intId   The data set id.
      *
      * @return array
      */
     protected function getSetValues($arrCell, $intId)
     {
-        return array(
-            'tstamp'  => time(),
-            'value'   => (string) $arrCell['value'],
-            'att_id'  => $this->get('id'),
-            'row'     => (int) $arrCell['row'],
-            'col'     => (int) $arrCell['col'],
-            'item_id' => $intId,
-        );
+        return [
+            $this->getValueTable() . '.tstamp'  => time(),
+            $this->getValueTable() . '.value'   => (string) $arrCell['value'],
+            $this->getValueTable() . '.att_id'  => $this->get('id'),
+            $this->getValueTable() . '.row'     => (int) $arrCell['row'],
+            $this->getValueTable() . '.col'     => (int) $arrCell['col'],
+            $this->getValueTable() . '.item_id' => $intId,
+        ];
     }
 
     /**

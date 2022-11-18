@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_tabletext.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2022 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,7 +15,8 @@
  * @author     David Greminger <david.greminger@1up.io>
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     David Molineus <david.molineus@netzmacht.de>
- * @copyright  2012-2019 The MetaModels team.
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @copyright  2012-2022 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -31,6 +32,8 @@ use MetaModels\IMetaModel;
 
 /**
  * Unit tests to test class TableText.
+ *
+ * @covers \MetaModels\AttributeTableTextBundle\Attribute\TableText
  */
 class TableTextTest extends TestCase
 {
@@ -115,27 +118,69 @@ class TableTextTest extends TestCase
             ->withConsecutive(
                 [
                     'tl_metamodel_tabletext',
-                    ['tstamp' => time(), 'value' => '1', 'att_id' => 42, 'row' => 0, 'col' => 0, 'item_id' => 21]
+                    [
+                        'tl_metamodel_tabletext.tstamp'  => time(),
+                        'tl_metamodel_tabletext.value'   => '1',
+                        'tl_metamodel_tabletext.att_id'  => 42,
+                        'tl_metamodel_tabletext.row'     => 0,
+                        'tl_metamodel_tabletext.col'     => 0,
+                        'tl_metamodel_tabletext.item_id' => 21
+                    ]
                 ],
                 [
                     'tl_metamodel_tabletext',
-                    ['tstamp' => time(), 'value' => '2', 'att_id' => 42, 'row' => 0, 'col' => 1, 'item_id' => 21]
+                    [
+                        'tl_metamodel_tabletext.tstamp'  => time(),
+                        'tl_metamodel_tabletext.value'   => '2',
+                        'tl_metamodel_tabletext.att_id'  => 42,
+                        'tl_metamodel_tabletext.row'     => 0,
+                        'tl_metamodel_tabletext.col'     => 1,
+                        'tl_metamodel_tabletext.item_id' => 21
+                    ]
                 ],
                 [
                     'tl_metamodel_tabletext',
-                    ['tstamp' => time(), 'value' => '3', 'att_id' => 42, 'row' => 0, 'col' => 2, 'item_id' => 21]
+                    [
+                        'tl_metamodel_tabletext.tstamp'  => time(),
+                        'tl_metamodel_tabletext.value'   => '3',
+                        'tl_metamodel_tabletext.att_id'  => 42,
+                        'tl_metamodel_tabletext.row'     => 0,
+                        'tl_metamodel_tabletext.col'     => 2,
+                        'tl_metamodel_tabletext.item_id' => 21
+                    ]
                 ],
                 [
                     'tl_metamodel_tabletext',
-                    ['tstamp' => time(), 'value' => '4', 'att_id' => 42, 'row' => 2, 'col' => 0, 'item_id' => 21]
+                    [
+                        'tl_metamodel_tabletext.tstamp'  => time(),
+                        'tl_metamodel_tabletext.value'   => '4',
+                        'tl_metamodel_tabletext.att_id'  => 42,
+                        'tl_metamodel_tabletext.row'     => 2,
+                        'tl_metamodel_tabletext.col'     => 0,
+                        'tl_metamodel_tabletext.item_id' => 21
+                    ]
                 ],
                 [
                     'tl_metamodel_tabletext',
-                    ['tstamp' => time(), 'value' => '5', 'att_id' => 42, 'row' => 2, 'col' => 1, 'item_id' => 21]
+                    [
+                        'tl_metamodel_tabletext.tstamp'  => time(),
+                        'tl_metamodel_tabletext.value'   => '5',
+                        'tl_metamodel_tabletext.att_id'  => 42,
+                        'tl_metamodel_tabletext.row'     => 2,
+                        'tl_metamodel_tabletext.col'     => 1,
+                        'tl_metamodel_tabletext.item_id' => 21
+                    ]
                 ],
                 [
                     'tl_metamodel_tabletext',
-                    ['tstamp' => time(), 'value' => '6', 'att_id' => 42, 'row' => 2, 'col' => 2, 'item_id' => 21]
+                    [
+                        'tl_metamodel_tabletext.tstamp'  => time(),
+                        'tl_metamodel_tabletext.value'   => '6',
+                        'tl_metamodel_tabletext.att_id'  => 42,
+                        'tl_metamodel_tabletext.row'     => 2,
+                        'tl_metamodel_tabletext.col'     => 2,
+                        'tl_metamodel_tabletext.item_id' => 21
+                    ]
                 ]
             );
 
@@ -193,12 +238,12 @@ class TableTextTest extends TestCase
         $selectBuilder
             ->expects($this->once())
             ->method('orderBy')
-            ->with('item_id', 'ASC')
+            ->with('t.item_id', 'ASC')
             ->willReturn($selectBuilder);
         $selectBuilder
             ->expects($this->exactly(2))
             ->method('addOrderBy')
-            ->withConsecutive(['row', 'ASC'], ['col', 'ASC'])
+            ->withConsecutive(['t.row', 'ASC'], ['t.col', 'ASC'])
             ->willReturn($selectBuilder);
 
         $selectStatement = $this->getMockBuilder(Statement::class)->disableOriginalConstructor()->getMock();

@@ -10,13 +10,13 @@
     "nontranslatable"
   ],
   "type": "contao-bundle",
-  "homepage": "http://now.metamodel.me/",
+  "homepage": "https://now.metamodel.me/",
   "license": "LGPL-3.0-or-later",
   "authors": [
     {
       "name": "Christian Schiffler",
       "email": "c.schiffler@cyberspectrum.de",
-      "homepage": "http://www.cyberspectrum.de",
+      "homepage": "https://www.cyberspectrum.de",
       "role": "Developer"
     },
     {
@@ -28,17 +28,17 @@
   "support": {
     "email": "mail@metamodel.me",
     "issues": "https://github.com/MetaModels/attribute_tabletext/issues",
-    "wiki": "http://de.contaowiki.org/MetaModels",
+    "wiki": "https://de.contaowiki.org/MetaModels",
     "irc": "irc://irc.freenode.org/contao.mm",
     "source": "https://github.com/MetaModels/attribute_tabletext"
   },
   "require": {
-    "php": "^7.1",
-    "contao-community-alliance/dc-general": "^2.1.0",
-    "contao/core-bundle": "^4.4.8",
-    "metamodels/core": "^2.1",
-    "symfony/dependency-injection": "^3.3 || ^4.0",
-    "symfony/http-kernel": "^3.3 || ^4.0"
+    "php": "^7.4",
+    "contao-community-alliance/dc-general": "^2.2",
+    "contao/core-bundle": "^4.9.0, <4.13.0",
+    "metamodels/core": "^2.2",
+    "symfony/dependency-injection": "^4.4.6",
+    "symfony/http-kernel": "~4.4.13"
   },
   "require-dev": {
     "contao/manager-plugin": "^2.1",
@@ -61,10 +61,14 @@
   "extra": {
     "contao-manager-plugin": "MetaModels\\AttributeTableTextBundle\\ContaoManager\\Plugin",
     "branch-alias": {
-      "dev-master": "2.1.x-dev"
+      "dev-feature/2.2.0": "2.2.x-dev"
     }
   },
   "config": {
+    "allow-plugins": {
+      "contao-components/installer": false,
+      "contao/manager-plugin": false
+    },
     "sort-packages": true
   }
 }
