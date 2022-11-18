@@ -8,6 +8,10 @@ exclude:
 mapping:
   'Andreas Isaak <info@andreas-isaak.de>': 'Andreas Isaak <andy.jared@googlemail.com>'
   'Christopher Boelter <christopher@boelter.eu>': 'cboelter <christopher@boelter.eu>'
+  'Ingolf Steinhardt <info@e-spin.de>':
+    - 'sandokan <info@e-spin.de>'
+    - 'zonky2 <info@e-spin.de>'
+    - 'zonky <info@e-spin.de>'
 
 copy-left:
   'David Maack <david.maack@arcor.de>':

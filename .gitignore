@@ -2,7 +2,7 @@
 .DS_Store
 Thumbs.db
 
-# IDEs 
+# IDEs
 .buildpath
 .project
 .settings/
@@ -17,3 +17,4 @@ vendor/
 # build
 build/
 composer.lock
+.phpunit.result.cache
