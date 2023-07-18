@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_tabletext.
  *
- * (c) 2012-2022 The MetaModels team.
+ * (c) 2012-2023 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,7 +20,7 @@
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2022 The MetaModels team.
+ * @copyright  2012-2023 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -80,14 +80,17 @@ class TableText extends BaseComplex
      */
     public function searchFor($strPattern)
     {
-        $query     =
-            'SELECT DISTINCT t.item_id FROM tl_metamodel_tabletext AS t WHERE value LIKE :value AND t.att_id = :id';
-        $statement = $this->connection->prepare($query);
-        $statement->bindValue('value', str_replace(['*', '?'], ['%', '_'], $strPattern));
-        $statement->bindValue('id', $this->get('id'));
-        $statement->executeQuery();
+        $strPattern = \str_replace(['*', '?'], ['%', '_'], $strPattern);
 
-        return $statement->fetchFirstColumn();
+        return $this->connection->createQueryBuilder()
+            ->select('t.item_id')
+            ->from($this->getValueTable(), 't')
+            ->where('t.value LIKE :pattern')
+            ->andWhere('t.att_id = :id')
+            ->setParameter('pattern', $strPattern)
+            ->setParameter('id', $this->get('id'))
+            ->executeQuery()
+            ->fetchFirstColumn();
     }
 
     /**
