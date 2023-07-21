@@ -98,7 +98,7 @@ class TableText extends BaseComplex
      */
     public function getAttributeSettingNames()
     {
-        return array_merge(
+        return \array_merge(
             parent::getAttributeSettingNames(),
             ['tabletext_cols', 'tabletext_minCount', 'tabletext_maxCount', 'tabletext_disable_sorting']
         );
@@ -133,15 +133,27 @@ class TableText extends BaseComplex
             ];
         }
 
+        if (!empty($arrFieldDef['eval']['readonly'])) {
+            $arrFieldDef['eval']['hideButtons'] = true;
+        }
+
         $arrFieldDef['eval']['columnFields'] = [];
 
-        $countCol = count($arrColLabels);
+        $countCol = \count($arrColLabels);
         for ($i = 0; $i < $countCol; $i++) {
+            // Init columnField.
             $arrFieldDef['eval']['columnFields']['col_' . $i] = [
                 'label'     => $arrColLabels[$i]['rowLabel'],
                 'inputType' => 'text',
                 'eval'      => [],
             ];
+
+            // Add readonly.
+            if (!empty($arrFieldDef['eval']['readonly'])) {
+                $arrFieldDef['eval']['columnFields']['col_' . $i]['eval']['readonly'] = true;
+            }
+
+            // Add style.
             if ($arrColLabels[$i]['rowStyle']) {
                 $arrFieldDef['eval']['columnFields']['col_' . $i]['eval']['style'] =
                     'width:' . $arrColLabels[$i]['rowStyle'];
@@ -162,7 +174,7 @@ class TableText extends BaseComplex
         }
 
         // Get the ids.
-        $arrIds = array_keys($arrValues);
+        $arrIds = \array_keys($arrValues);
 
         // Reset all data for the ids.
         $this->unsetDataFor($arrIds);
@@ -211,7 +223,7 @@ class TableText extends BaseComplex
         while ($objRow = $statement->fetchAssociative()) {
             $strValue = $objRow['value'];
 
-            if (is_array($arrCount)) {
+            if (\is_array($arrCount)) {
                 $arrCount[$strValue] = $objRow['mm_count'];
             }
 
@@ -272,7 +284,7 @@ class TableText extends BaseComplex
             }
         }
 
-        $builder->execute();
+        $builder->executeQuery();
     }
 
     /**
@@ -297,14 +309,14 @@ class TableText extends BaseComplex
         $strWhereIds = '';
         $strRowCol   = '';
         if ($mixIds) {
-            if (is_array($mixIds)) {
-                $strWhereIds = ' AND ' . $tableAlias . 'item_id IN (' . implode(',', $mixIds) . ')';
+            if (\is_array($mixIds)) {
+                $strWhereIds = ' AND ' . $tableAlias . 'item_id IN (' . \implode(',', $mixIds) . ')';
             } else {
                 $strWhereIds = ' AND ' . $tableAlias . 'item_id=' . $mixIds;
             }
         }
 
-        if (is_int($intRow) && is_int($intCol)) {
+        if (\is_int($intRow) && \is_int($intCol)) {
             $strRowCol = ' AND ' . $tableAlias . 'row = :row AND ' . $tableAlias . 'col = :col';
         }
 
@@ -325,17 +337,17 @@ class TableText extends BaseComplex
      */
     public function valueToWidget($varValue)
     {
-        if (!is_array($varValue)) {
+        if (!\is_array($varValue)) {
             return [];
         }
 
         $arrColLabels = StringUtil::deserialize($this->get('tabletext_cols'), true);
-        $countCol     = count($arrColLabels);
+        $countCol     = \count($arrColLabels);
         $widgetValue  = [];
 
         foreach ($varValue as $k => $row) {
             for ($kk = 0; $kk < $countCol; $kk++) {
-                $index = array_search($kk, array_column($row, 'col'));
+                $index = \array_search($kk, \array_column($row, 'col'));
 
                 $widgetValue[$k]['col_' . $kk] = ($index !== false) ? $row[$index]['value'] : '';
             }
