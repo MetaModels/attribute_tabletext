@@ -1,6 +1,8 @@
 {
   "name": "metamodels/attribute_tabletext",
   "description": "MetaModels attribute for dynamic table text",
+  "license": "LGPL-3.0-or-later",
+  "type": "contao-bundle",
   "keywords": [
     "contao",
     "metamodels",
@@ -9,9 +11,6 @@
     "tabletext",
     "nontranslatable"
   ],
-  "type": "contao-bundle",
-  "homepage": "https://now.metamodel.me/",
-  "license": "LGPL-3.0-or-later",
   "authors": [
     {
       "name": "Christian Schiffler",
@@ -25,6 +24,7 @@
       "role": "Developer"
     }
   ],
+  "homepage": "https://now.metamodel.me/",
   "support": {
     "email": "mail@metamodel.me",
     "issues": "https://github.com/MetaModels/attribute_tabletext/issues",
@@ -33,9 +33,9 @@
     "source": "https://github.com/MetaModels/attribute_tabletext"
   },
   "require": {
-    "php": "^7.4 || ^8.0",
-    "contao-community-alliance/dc-general": "^2.3@dev",
-    "contao/core-bundle": "^4.13.0, <5.0",
+    "php": "^8.1",
+    "contao-community-alliance/dc-general": "^2.3",
+    "contao/core-bundle": "^4.13.0 <5.0",
     "metamodels/core": "^2.3@dev",
     "symfony/dependency-injection": "^5.4",
     "symfony/http-kernel": "^5.4"
@@ -43,8 +43,14 @@
   "require-dev": {
     "contao/manager-plugin": "^2.1",
     "menatwork/contao-multicolumnwizard-bundle": "^3.4",
-    "phpcq/all-tasks": "^1.2"
+    "phpcq/runner-bootstrap": "^1.0@dev"
   },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://packages.cyberspectrum.de/r"
+    }
+  ],
   "autoload": {
     "psr-4": {
       "MetaModels\\AttributeTableTextBundle\\": "src"
@@ -58,17 +64,18 @@
       "MetaModels\\AttributeTableTextBundle\\Test\\": "tests/Test"
     }
   },
-  "extra": {
-    "contao-manager-plugin": "MetaModels\\AttributeTableTextBundle\\ContaoManager\\Plugin",
-    "branch-alias": {
-      "dev-feature/2.3.0": "2.3.x-dev"
-    }
-  },
   "config": {
     "allow-plugins": {
       "contao-components/installer": false,
-      "contao/manager-plugin": false
+      "contao/manager-plugin": false,
+      "php-http/discovery": true
     },
     "sort-packages": true
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-feature/2.3.0": "2.3.x-dev"
+    },
+    "contao-manager-plugin": "MetaModels\\AttributeTableTextBundle\\ContaoManager\\Plugin"
   }
 }

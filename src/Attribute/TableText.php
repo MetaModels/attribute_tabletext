@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_tabletext.
  *
- * (c) 2012-2023 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,7 +20,7 @@
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2023 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -29,12 +29,15 @@ namespace MetaModels\AttributeTableTextBundle\Attribute;
 
 use Contao\StringUtil;
 use Contao\System;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use MetaModels\Attribute\BaseComplex;
 use MetaModels\IMetaModel;
 
 /**
  * This is the MetaModelAttribute class for handling table text fields.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class TableText extends BaseComplex
 {
@@ -43,7 +46,7 @@ class TableText extends BaseComplex
      *
      * @var Connection
      */
-    private $connection;
+    private Connection $connection;
 
     /**
      * Instantiate an MetaModel attribute.
@@ -51,11 +54,9 @@ class TableText extends BaseComplex
      * Note that you should not use this directly but use the factory classes to instantiate attributes.
      *
      * @param IMetaModel      $objMetaModel The MetaModel instance this attribute belongs to.
-     *
      * @param array           $arrData      The information array, for attribute information, refer to documentation of
      *                                      table tl_metamodel_attribute and documentation of the certain attribute
      *                                      classes for information what values are understood.
-     *
      * @param Connection|null $connection   The database connection.
      */
     public function __construct(IMetaModel $objMetaModel, array $arrData = [], Connection $connection = null)
@@ -70,8 +71,8 @@ class TableText extends BaseComplex
             );
             // @codingStandardsIgnoreEnd
             $connection = System::getContainer()->get('database_connection');
+            assert($connection instanceof Connection);
         }
-
         $this->connection = $connection;
     }
 
@@ -210,11 +211,11 @@ class TableText extends BaseComplex
             ->groupBy('t.value');
 
 
-        if ($idList) {
+        if (null !== $idList) {
             $builder
                 ->andWhere('t.item_id IN (:id_list)')
                 ->orderBy('FIELD(t.id,:id_list)')
-                ->setParameter('id_list', $idList, Connection::PARAM_INT_ARRAY);
+                ->setParameter('id_list', $idList, ArrayParameterType::INTEGER);
         }
 
         $statement = $builder->executeQuery();
@@ -291,18 +292,15 @@ class TableText extends BaseComplex
      * Build a where clause for the given id(s) and rows/cols.
      *
      * @param mixed    $mixIds     One, none or many ids to use.
-     *
      * @param int|null $intRow     The row number, optional.
-     *
      * @param int|null $intCol     The col number, optional.
+     * @param string   $tableAlias The table alias.
      *
-     * @param null     $tableAlias The table alias.
-     *
-     * @return array<string,string|array>
+     * @return array<string, array<string, string|int|null>>
      */
-    protected function getWhere($mixIds, $intRow = null, $intCol = null, $tableAlias = null)
+    protected function getWhere($mixIds, $intRow = null, $intCol = null, $tableAlias = '')
     {
-        if (null !== $tableAlias) {
+        if ('' !== $tableAlias) {
             $tableAlias .= '.';
         }
 
@@ -347,7 +345,7 @@ class TableText extends BaseComplex
 
         foreach ($varValue as $k => $row) {
             for ($kk = 0; $kk < $countCol; $kk++) {
-                $index = \array_search($kk, \array_column($row, 'col'));
+                $index = \array_search($kk, \array_column($row, 'col'), true);
 
                 $widgetValue[$k]['col_' . $kk] = ($index !== false) ? $row[$index]['value'] : '';
             }
@@ -361,21 +359,25 @@ class TableText extends BaseComplex
      */
     public function widgetToValue($varValue, $itemId)
     {
-        if (!is_array($varValue)) {
+        /** @var array<int, array<string, string>>|null|string $varValue */
+        if (!\is_array($varValue)) {
             return [];
         }
 
+        /** @var list<list<array{value: string, col: int, row: int}>> $newValue */
         $newValue = [];
         // Start row numerator at 0.
         $intRow = 0;
-        foreach ($varValue as $k => $row) {
-            foreach ($row as $kk => $col) {
-                $kk = str_replace('col_', '', $kk);
-
-                $newValue[$k][$kk]['value'] = $col;
-                $newValue[$k][$kk]['col']   = (int) $kk;
-                $newValue[$k][$kk]['row']   = $intRow;
+        foreach ($varValue as $row) {
+            $newRow = [];
+            foreach ($row as $colName => $value) {
+                $newRow[] = [
+                    'value' => $value,
+                    'col' => (int) \str_replace('col_', '', $colName),
+                    'row' => $intRow,
+                ];
             }
+            $newValue[] = $newRow;
             $intRow++;
         }
 
@@ -393,7 +395,7 @@ class TableText extends BaseComplex
     protected function getSetValues($arrCell, $intId)
     {
         return [
-            $this->getValueTable() . '.tstamp'  => time(),
+            $this->getValueTable() . '.tstamp'  => \time(),
             $this->getValueTable() . '.value'   => (string) $arrCell['value'],
             $this->getValueTable() . '.att_id'  => $this->get('id'),
             $this->getValueTable() . '.row'     => (int) $arrCell['row'],
@@ -411,10 +413,10 @@ class TableText extends BaseComplex
      *
      * @return void
      */
-    private function pushValue($value, &$result, $countCol)
+    private function pushValue(array $value, array &$result, int $countCol): void
     {
-        $buildRow = function (&$list, $itemId, $row) use ($countCol) {
-            for ($i = count($list); $i < $countCol; $i++) {
+        $buildRow = function (array &$list, int $itemId, int $row) use ($countCol): void {
+            for ($i = \count($list); $i < $countCol; $i++) {
                 $list[$i] = [
                     'tstamp'  => 0,
                     'value'   => '',
@@ -432,7 +434,7 @@ class TableText extends BaseComplex
         }
 
         // Prepare all rows up until to this item.
-        $row = count($result[$itemId]);
+        $row = \count($result[$itemId]);
         while ($row <= $value['row']) {
             if (!isset($result[$itemId][$row])) {
                 $result[$itemId][$row] = [];

@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_tabletext.
  *
- * (c) 2012-2022 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     David Molineus <david.molineus@netzmacht.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2022 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_tabletext/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -25,7 +25,7 @@ namespace MetaModels\AttributeTableTextBundle\Test\Attribute;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Statement;
+use Doctrine\DBAL\Result;
 use MetaModels\AttributeTableTextBundle\Attribute\TableText;
 use PHPUnit\Framework\TestCase;
 use MetaModels\IMetaModel;
@@ -92,6 +92,8 @@ class TableTextTest extends TestCase
      * Test saving with an empty row.
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function testSavingEmptyRow()
     {
@@ -106,7 +108,7 @@ class TableTextTest extends TestCase
             ->willReturn($deleteBuilder);
         $deleteBuilder
             ->expects($this->once())
-            ->method('execute');
+            ->method('executeQuery');
 
         $mockDB
             ->expects($this->once())
@@ -233,7 +235,7 @@ class TableTextTest extends TestCase
         $selectBuilder
             ->expects($this->once())
             ->method('from')
-            ->with('tl_metamodel_tabletext')
+            ->with('tl_metamodel_tabletext', 't')
             ->willReturn($selectBuilder);
         $selectBuilder
             ->expects($this->once())
@@ -243,13 +245,26 @@ class TableTextTest extends TestCase
         $selectBuilder
             ->expects($this->exactly(2))
             ->method('addOrderBy')
-            ->withConsecutive(['t.row', 'ASC'], ['t.col', 'ASC'])
-            ->willReturn($selectBuilder);
+            ->willReturnCallback(
+                function (string $column, string $direction) use ($selectBuilder): QueryBuilder {
+                    static $invocation = 0;
+                    static $expected = [
+                        0 => ['t.row', 'ASC'],
+                        1 => ['t.col', 'ASC'],
+                    ];
 
-        $selectStatement = $this->getMockBuilder(Statement::class)->disableOriginalConstructor()->getMock();
-        $selectStatement
+                    self::assertSame($expected[$invocation][0] ?? null, $column);
+                    self::assertSame($expected[$invocation][1] ?? null, $direction);
+                    $invocation++;
+
+                    return $selectBuilder;
+                }
+            );
+
+        $selectResult = $this->getMockBuilder(Result::class)->disableOriginalConstructor()->getMock();
+        $selectResult
             ->expects($this->exactly(6))
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturnOnConsecutiveCalls(
                 ['tstamp' => 123456789, 'value' => '1', 'att_id' => 42, 'row' => 0, 'col' => 0, 'item_id' => 21],
                 ['tstamp' => 123456789, 'value' => '2', 'att_id' => 42, 'row' => 0, 'col' => 1, 'item_id' => 21],
@@ -261,8 +276,8 @@ class TableTextTest extends TestCase
 
         $selectBuilder
             ->expects($this->once())
-            ->method('execute')
-            ->willReturn($selectStatement);
+            ->method('executeQuery')
+            ->willReturn($selectResult);
 
         $text = new TableText(
             $metaModel,
