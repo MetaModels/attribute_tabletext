@@ -103,8 +103,7 @@ class TableText extends BaseComplex
             ->andWhere('t.att_id = :id')
             ->setParameter('pattern', $strPattern)
             ->setParameter('id', $this->get('id'))
-            ->executeQuery()
-            ->fetchFirstColumn();
+            ->executeQuery();
 
         // Return value list as list<mixed>, parent function wants a list<string> so we make a cast.
         return array_map(static fn (mixed $value) => (string) $value, $statement->fetchFirstColumn());
@@ -403,8 +402,8 @@ class TableText extends BaseComplex
     /**
      * Calculate the array of query parameters for the given cell.
      *
-     * @param array $arrCell The cell to calculate.
-     * @param int   $intId   The data set id.
+     * @param array  $arrCell The cell to calculate.
+     * @param string $intId   The data set id.
      *
      * @return array
      */
