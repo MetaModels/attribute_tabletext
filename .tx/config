@@ -1,0 +1,20 @@
+[main]
+host = https://app.transifex.com
+
+[o:metamodels:p:attribute-tabletext:r:tl_metamodel_attribute]
+file_filter            = src/Resources/translations/tl_metamodel_attribute.<lang>.xlf
+source_file            = src/Resources/translations/tl_metamodel_attribute.en.xlf
+type                   = XLIFF
+minimum_perc           = 0
+resource_name          = tl_metamodel_attribute
+replace_edited_strings = false
+keep_translations      = false
+
+[o:metamodels:p:attribute-tabletext:r:tl_metamodel_rendersetting]
+file_filter            = src/Resources/translations/tl_metamodel_rendersetting.<lang>.xlf
+source_file            = src/Resources/translations/tl_metamodel_rendersetting.en.xlf
+type                   = XLIFF
+minimum_perc           = 0
+resource_name          = tl_metamodel_rendersetting
+replace_edited_strings = false
+keep_translations      = false

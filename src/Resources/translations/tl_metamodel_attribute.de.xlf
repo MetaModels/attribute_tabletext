@@ -1,0 +1,54 @@
+<?xml version="1.0" ?><xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" datatype="plaintext" original="src/Resources/translations/tl_metamodel_attribute.en.xlf" target-language="de">
+    <body>
+      <trans-unit id="typeOptions.tabletext" resname="typeOptions.tabletext">
+        <source>Text table</source>
+        <target>Text-Tabelle</target>
+      </trans-unit>
+      <trans-unit id="tabletext_cols.label" resname="tabletext_cols.label">
+        <source>Column config</source>
+        <target>Spalteneinstellung</target>
+      </trans-unit>
+      <trans-unit id="tabletext_rowLabel.label" resname="tabletext_rowLabel.label">
+        <source>Label</source>
+        <target>Label</target>
+      </trans-unit>
+      <trans-unit id="tabletext_rowLabel.description" resname="tabletext_rowLabel.description">
+        <source>Please enter ther labels for the columns.</source>
+        <target>Bitte geben Sie die Labels für die Spalten an.</target>
+      </trans-unit>
+      <trans-unit id="tabletext_rowStyle.label" resname="tabletext_rowStyle.label">
+        <source>Width</source>
+        <target>Breite</target>
+      </trans-unit>
+      <trans-unit id="tabletext_rowStyle.description" resname="tabletext_rowStyle.description">
+        <source>Please enter the width of the columns (e.g. 200px).</source>
+        <target>Bitte geben Sie die Spaltenbreite ein (z. B. 200px).</target>
+      </trans-unit>
+      <trans-unit id="tabletext_minCount.label" resname="tabletext_minCount.label">
+        <source>Minimum count of rows</source>
+        <target>Mindestanzahl der Zeilen</target>
+      </trans-unit>
+      <trans-unit id="tabletext_minCount.description" resname="tabletext_minCount.description">
+        <source>Please enter minimum count of rows - 0 sets the value without limit.</source>
+        <target>Bitte geben Sie die Mindestanzahl der Zeilen ein - 0 setzt den Wert ohne Begrenzung.</target>
+      </trans-unit>
+      <trans-unit id="tabletext_maxCount.label" resname="tabletext_maxCount.label">
+        <source>Maximum count of rows</source>
+        <target>Maximale Anzahl von Zeilen</target>
+      </trans-unit>
+      <trans-unit id="tabletext_maxCount.description" resname="tabletext_maxCount.description">
+        <source>Please enter maximum count of rows - 0 sets the value without limit.</source>
+        <target>Bitte geben Sie die maximale Anzahl der Zeilen ein - 0 setzt den Wert ohne Begrenzung.</target>
+      </trans-unit>
+      <trans-unit id="tabletext_disable_sorting.label" resname="tabletext_disable_sorting.label">
+        <source>Disable sorting</source>
+        <target>Sortierung deaktivieren</target>
+      </trans-unit>
+      <trans-unit id="tabletext_disable_sorting.description" resname="tabletext_disable_sorting.description">
+        <source>If this option is activated, the sorting is hidden.</source>
+        <target>Wenn diese Option aktiviert ist, wird die Sortierung ausgeblendet.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
