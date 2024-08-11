@@ -42,14 +42,16 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tabletext_cols'] = [
         'useTranslator' => true,
         'columnFields'  => [
             'rowLabel' => [
-                'label'     => 'tabletext_rowLabel.label',
-                'inputType' => 'text',
-                'eval'      => ['allowHtml' => false, 'style' => 'width: 100%;'],
+                'label'       => 'tabletext_rowLabel.label',
+                'description' => 'tabletext_rowLabel.description',
+                'inputType'   => 'text',
+                'eval'        => ['allowHtml' => false, 'style' => 'width: 100%;'],
             ],
             'rowStyle' => [
-                'label'     => 'tabletext_rowStyle.label',
-                'inputType' => 'text',
-                'eval'      => ['allowHtml' => false, 'style' => 'width: 100%;'],
+                'label'       => 'tabletext_rowStyle.label',
+                'description' => 'tabletext_rowStyle.description',
+                'inputType'   => 'text',
+                'eval'        => ['allowHtml' => false, 'style' => 'width: 100%;'],
             ],
         ],
         'tl_class'      => 'clr w50',
