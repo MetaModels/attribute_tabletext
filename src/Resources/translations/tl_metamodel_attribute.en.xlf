@@ -8,17 +8,20 @@
       <trans-unit id="tabletext_cols.label" resname="tabletext_cols.label">
         <source>Column config</source>
       </trans-unit>
+      <trans-unit id="tabletext_cols.description" resname="tabletext_cols.description">
+        <source>Please enter a label and width for each column.</source>
+      </trans-unit>
       <trans-unit id="tabletext_rowLabel.label" resname="tabletext_rowLabel.label">
         <source>Label</source>
       </trans-unit>
       <trans-unit id="tabletext_rowLabel.description" resname="tabletext_rowLabel.description">
-        <source>Please enter ther labels for the columns.</source>
+        <source>Please enter the label for the column.</source>
       </trans-unit>
       <trans-unit id="tabletext_rowStyle.label" resname="tabletext_rowStyle.label">
         <source>Width</source>
       </trans-unit>
       <trans-unit id="tabletext_rowStyle.description" resname="tabletext_rowStyle.description">
-        <source>Please enter the width of the columns (e.g. 200px).</source>
+        <source>Please enter the width of the column (e.g. 200px).</source>
       </trans-unit>
       <trans-unit id="tabletext_minCount.label" resname="tabletext_minCount.label">
         <source>Minimum count of rows</source>
