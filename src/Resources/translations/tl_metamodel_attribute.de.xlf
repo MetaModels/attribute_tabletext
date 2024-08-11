@@ -9,20 +9,24 @@
         <source>Column config</source>
         <target>Spalteneinstellung</target>
       </trans-unit>
+      <trans-unit id="tabletext_cols.description" resname="tabletext_cols.description">
+        <source>Please enter a label and width for each column.</source>
+        <target>Bitte geben Sie die Labels und die Breite für die Spalten an.</target>
+      </trans-unit>
       <trans-unit id="tabletext_rowLabel.label" resname="tabletext_rowLabel.label">
         <source>Label</source>
         <target>Label</target>
       </trans-unit>
       <trans-unit id="tabletext_rowLabel.description" resname="tabletext_rowLabel.description">
-        <source>Please enter ther labels for the columns.</source>
-        <target>Bitte geben Sie die Labels für die Spalten an.</target>
+        <source>Please enter the label for the column.</source>
+        <target>Bitte geben Sie ein Label für die Spalten an.</target>
       </trans-unit>
       <trans-unit id="tabletext_rowStyle.label" resname="tabletext_rowStyle.label">
         <source>Width</source>
         <target>Breite</target>
       </trans-unit>
       <trans-unit id="tabletext_rowStyle.description" resname="tabletext_rowStyle.description">
-        <source>Please enter the width of the columns (e.g. 200px).</source>
+        <source>Please enter the width of the column (e.g. 200px).</source>
         <target>Bitte geben Sie die Spaltenbreite ein (z. B. 200px).</target>
       </trans-unit>
       <trans-unit id="tabletext_minCount.label" resname="tabletext_minCount.label">
