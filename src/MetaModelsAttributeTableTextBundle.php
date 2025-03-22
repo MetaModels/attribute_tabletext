@@ -26,5 +26,4 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class MetaModelsAttributeTableTextBundle extends Bundle
 {
-
 }
